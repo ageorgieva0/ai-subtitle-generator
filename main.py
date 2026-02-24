@@ -6,10 +6,9 @@ from deep_translator import GoogleTranslator
 import subprocess, uuid, os, shutil
 
 app = FastAPI()
-UPLOAD_DIR = "/home/user/app/uploads"
+UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Note: Using 'cpu' for Mac compatibility. If you have an NVIDIA GPU, use 'cuda'.
 model = WhisperModel("large-v3", device="cpu", compute_type="int8")
 
 def format_time(seconds):
@@ -30,8 +29,8 @@ def hex_to_ass_color(hex_color):
 @app.post("/upload")
 async def upload_video(
     file: UploadFile = File(...),
-    audio_language: str = Form("en"),      # The language being spoken
-    subtitle_language: str = Form("bg"),   # The language for subtitles
+    audio_language: str = Form("en"),
+    subtitle_language: str = Form("en"),  # <--- Add this line
     font_name: str = Form("Arial"),
     font_size: int = Form(24),
     text_color: str = Form("#FFFFFF"),
@@ -44,28 +43,22 @@ async def upload_video(
     srt_path = os.path.abspath(f"{UPLOAD_DIR}/{job_id}.srt")
     output_video = os.path.abspath(f"{UPLOAD_DIR}/{job_id}_subbed.mp4")
 
-    # Save uploaded video
     with open(video_path, "wb") as f:
         f.write(await file.read())
 
-    # 1. Extract audio
     subprocess.run(["ffmpeg", "-y", "-i", video_path, "-ar", "16000", "-ac", "1", audio_path])
 
-    # 2. Transcribe (Detect/Use source language)
     segments, _ = model.transcribe(audio_path, language=audio_language, beam_size=5)
     segments = list(segments)
 
-    # 3. Handle Translation
     translator = None
     if audio_language != subtitle_language:
         translator = GoogleTranslator(source=audio_language, target=subtitle_language)
 
-    # 4. Write SRT
     with open(srt_path, "w", encoding="utf-8") as srt:
         for i, seg in enumerate(segments, 1):
             original_text = seg.text.strip()
             
-            # Translate if needed
             if translator:
                 try:
                     display_text = translator.translate(original_text)
@@ -77,7 +70,6 @@ async def upload_video(
 
             srt.write(f"{i}\n{format_time(seg.start)} --> {format_time(seg.end)}\n{display_text}\n\n")
 
-    # 5. Burn Subtitles via FFmpeg
     ass_text_color = hex_to_ass_color(text_color)
     ass_outline_color = hex_to_ass_color(outline_color)
     style = (f"Fontname={font_name},Fontsize={font_size},"
