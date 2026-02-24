@@ -116,7 +116,65 @@ fontSelect.addEventListener('change', () => {
 
 form.onsubmit = (e) => {
     e.preventDefault();
-    // ... your existing XHR upload code remains the same ...
+    
+    // Check if a file is actually selected
+    const fileInput = document.getElementById("file");
+    if (!fileInput.files[0]) {
+        alert("Please select a video file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("audio_language", audioSelect.value);
+    formData.append("subtitle_language", subSelect.value); // Uses the subSelect variable defined at top
+    formData.append("font_name", fontSelect.value);
+    formData.append("font_size", document.getElementById("font_size").value);
+    formData.append("text_color", document.getElementById("text_color").value);
+    formData.append("outline_color", document.getElementById("outline_color").value);
+
+    // UI Feedback
+    document.getElementById("progress-container").style.display = "block";
+    document.getElementById("links").innerHTML = "";
+    
+    const xhr = new XMLHttpRequest();
+    
+    // Track upload progress
+    xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            document.getElementById("progressBar").value = pct;
+            document.getElementById("status").textContent = `Uploading: ${pct}%`;
+            if (pct === 100) {
+                document.getElementById("status").textContent = "AI Processing... This may take a minute.";
+            }
+        }
+    };
+
+    // Handle the server response
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            try {
+                const resp = JSON.parse(xhr.responseText);
+                document.getElementById("status").textContent = "Done!";
+                document.getElementById("links").innerHTML = `
+                    <a href="${resp.download_video}" target="_blank">⬇ Download Subtitled Video</a>
+                    <a href="${resp.download_srt}" target="_blank">⬇ Download SRT File</a>
+                `;
+            } catch (err) {
+                document.getElementById("status").textContent = "Error parsing server response.";
+            }
+        } else {
+            document.getElementById("status").textContent = "Server Error: " + xhr.status;
+        }
+    };
+
+    xhr.onerror = () => {
+        document.getElementById("status").textContent = "Connection failed.";
+    };
+
+    xhr.open("POST", "/upload");
+    xhr.send(formData);
 };
 
 // --- INITIALIZE ---
