@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Subtitle Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1 id="ui-title">AI Subtitle Studio</h1>
+
+  <div class="preview-container">
+    <div id="previewText" class="preview-text">Preview Text</div>
+  </div>
+
+  <form id="form">
+    <div class="field">
+      <label id="lbl-file">Video File</label>
+      <input type="file" id="file" accept="video/*" required />
+    </div>
+
+    <div class="row">
+        <div class="col field">
+            <label id="lbl-audio-lang">Audio (Speech)</label>
+            <select id="audio_language"></select>
+        </div>
+        <div class="col field">
+            <label id="lbl-sub-lang">Subtitles (Target)</label>
+            <select id="subtitle_language"></select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col field">
+           <label for="fontSelect">Choose Caption Font:</label>
+                <select id="fontSelect">
+                    <option value="Arial">Loading fonts...</option>
+                </select>
+        </div>
+        <div class="col field">
+            <label id="lbl-size">Size</label>
+            <input type="number" id="font_size" value="18" min="10" max="72" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col field">
+            <label id="lbl-text-clr">Text Color</label>
+            <input type="color" id="text_color" value="#FFFFFF" />
+        </div>
+        <div class="col field">
+            <label id="lbl-out-clr">Outline</label>
+            <input type="color" id="outline_color" value="#000000" />
+        </div>
+    </div>
+
+    <button type="submit" id="btn-submit">Generate Subtitles</button>
+  </form>
+
+  <div id="progress-container">
+    <progress id="progressBar" value="0" max="100"></progress>
+    <div id="status">Preparing...</div>
+  </div>
+
+  <div id="links"></div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
