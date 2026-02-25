@@ -82,7 +82,7 @@ async def upload_video(
             "-i", video_path,
             "-vf", f"subtitles='{srt_path}':force_style='{style}'", 
             "-c:v", "libx264",
-            "-preset", "fast",
+            "-preset", "ultrafast",
             "-c:a", "copy",              
             output_video
         ],
