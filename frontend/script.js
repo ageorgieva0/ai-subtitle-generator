@@ -1,3 +1,5 @@
+alert("JS is working!");
+
 const audioSelect = document.getElementById("audio_language");
 const subSelect = document.getElementById("subtitle_language");
 const fontSelect = document.getElementById('fontSelect');
