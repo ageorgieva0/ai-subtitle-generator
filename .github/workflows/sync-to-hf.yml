@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Push to Hugging Face
         env:
@@ -20,7 +20,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
 
-          git clone https://user:$HF_TOKEN@huggingface.co/alkeu0/ai-subtitle-generator hf-repo
+          git clone https://alkeu0:$HF_TOKEN@huggingface.co/alkeu0/ai-subtitle-generator hf-repo
           rsync -av --delete ./ hf-repo/ --exclude .git
           cd hf-repo
           git add .
