@@ -19,7 +19,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          git clone https://__token__:${HF_TOKEN}@huggingface.co/alkeu0/ai-subtitle-generator hf-repo
+          git clone https://__token__:${HF_TOKEN}@https://huggingface.co/spaces/alkeu0/ai-subtitle-generator
 
           rsync -av --delete ./ hf-repo/ --exclude .git --exclude hf-repo
 
