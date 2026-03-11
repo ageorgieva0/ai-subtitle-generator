@@ -1,0 +1,28 @@
+name: Sync to Hugging Face
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+
+          git clone https://user:$HF_TOKEN@huggingface.co/alkeu0/ai-subtitle-generator hf-repo
+          rsync -av --delete ./ hf-repo/ --exclude .git
+          cd hf-repo
+          git add .
+          git commit -m "Sync from GitHub" || echo "No changes"
+          git push
